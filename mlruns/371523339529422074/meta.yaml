@@ -1,0 +1,6 @@
+artifact_location: mlflow-artifacts:/371523339529422074
+creation_time: 1749724822291
+experiment_id: '371523339529422074'
+last_update_time: 1749724822291
+lifecycle_stage: active
+name: animal_classifier

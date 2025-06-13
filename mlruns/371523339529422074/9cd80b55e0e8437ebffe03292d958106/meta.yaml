@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/371523339529422074/9cd80b55e0e8437ebffe03292d958106/artifacts
+end_time: 1749728714675
+entry_point_name: ''
+experiment_id: '371523339529422074'
+lifecycle_stage: active
+run_id: 9cd80b55e0e8437ebffe03292d958106
+run_name: run_2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1749726287818
+status: 4
+tags: []
+user_id: tamil
