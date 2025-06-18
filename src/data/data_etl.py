@@ -3,7 +3,7 @@ from torchvision import datasets, transforms
 
 from collections import Counter
 import logging
-from helper_functions import save_tensor_image
+from utils.helper_functions import save_tensor_image
 
 logger = logging.getLogger(__name__)
 

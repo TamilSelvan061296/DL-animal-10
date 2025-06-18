@@ -1,7 +1,7 @@
 import typer
 from typing import Type
-from data_etl import load_and_transform
-from training import train
+from data.data_etl import load_and_transform
+from models.training import train
 import logging
 
 logging.basicConfig(
