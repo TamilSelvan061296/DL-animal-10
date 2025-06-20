@@ -89,7 +89,7 @@ def save_tensor_image(
         str:  The full path to the saved image file.
     """
     # ensure output directory exists
-    os.makedirs(save_dir, exist_ok=True)
+    # os.makedirs(save_dir, exist_ok=True)
 
     # generate a filename if needed
     if filename is None:
@@ -105,8 +105,9 @@ def save_tensor_image(
         std  = np.array([0.229, 0.224, 0.225])
         arr = std * arr + mean
         arr = np.clip(arr, 0, 1)
-
+    
+    path = None
     # save out as a PNG
-    plt.imsave(path, arr)
+    # plt.imsave(path, arr)
 
     return path

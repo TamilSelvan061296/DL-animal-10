@@ -60,7 +60,7 @@ class train:
             "criterion": criterion.__class__.__name__
         }
 
-        with mlflow.start_run(run_name = "run_2"):
+        with mlflow.start_run(run_name = "final-run") as run:
 
             mlflow.log_params(hyperparams)
 
@@ -132,3 +132,19 @@ class train:
                             f"Accuracy: {accuracy/len(test_dataloader):.3f}")
                         running_loss = 0
                         self.model.train()
+
+                        mlflow.pytorch.log_model(
+                            pytorch_model=self.model,
+                            artifact_path="models",
+                            registered_model_name="animal_classifier"
+                            )
+                        print("Model registered under run:", run.info.run_id)
+
+                    if steps % 20 == 0:
+                        mlflow.pytorch.save_model(
+                            pytorch_model = self.model,
+                            path          = "/home/ubuntu/work/DL-animal-10/src/models/animal_classifier"
+                            )
+
+                        print("Local model saved to /home/ubuntu/work/DL-animal-10/src/models/animal_classifier")
+                        break                   
