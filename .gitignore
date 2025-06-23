@@ -7,5 +7,5 @@ log_file.log
 mlartifacts
 mlruns
 tmp_artifacts
-src/__pycache__/
-src/dl_animal_10.egg-info/
+dl_animal_10.egg-info
+__pycache__

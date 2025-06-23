@@ -11,6 +11,7 @@ from collections import OrderedDict
 import time
 import mlflow
 import mlflow.pytorch
+from mlflow.models.signature import infer_signature
 import logging
 
 logger = logging.getLogger(__name__)
@@ -93,7 +94,7 @@ class train:
                         with torch.no_grad():
                             for inputs, labels in test_dataloader:
                                 inputs, labels = inputs.to(device), labels.to(device)
-
+                                
                                 logps = self.model.forward(inputs)
                                 batch_loss = criterion(logps, labels)
 
@@ -133,18 +134,30 @@ class train:
                         running_loss = 0
                         self.model.train()
 
-                        mlflow.pytorch.log_model(
+                        if accuracy/len(test_dataloader) > 0.85: # save the version of the model if accuracy > 0.85
+
+                            signature = infer_signature(inputs[0], ps[0])
+                            mlflow.pytorch.log_model(
+                                pytorch_model=self.model,
+                                artifact_path="models",
+                                registered_model_name="animal_classifier",
+                                signature=signature,
+                                )
+                            print("Model registered under run:", run.info.run_id)
+            
+            
+            mlflow.pytorch.log_model(
                             pytorch_model=self.model,
                             artifact_path="models",
-                            registered_model_name="animal_classifier"
+                            registered_model_name="animal_classifier",
+                            signature=signature,
                             )
-                        print("Model registered under run:", run.info.run_id)
+            print("Model registered under run:", run.info.run_id)
+            
+            mlflow.pytorch.save_model(
+                pytorch_model = self.model,
+                path          = "/home/ubuntu/work/DL-animal-10/src/models/animal_classifier",
+                signature=signature,
+                )
 
-                    if steps % 20 == 0:
-                        mlflow.pytorch.save_model(
-                            pytorch_model = self.model,
-                            path          = "/home/ubuntu/work/DL-animal-10/src/models/animal_classifier"
-                            )
-
-                        print("Local model saved to /home/ubuntu/work/DL-animal-10/src/models/animal_classifier")
-                        break                   
+            print("Local model saved to /home/ubuntu/work/DL-animal-10/src/models/animal_classifier")              

@@ -34,7 +34,7 @@ mlflow.pytorch.save_model(
     path=save_path,
     signature=signature,
     input_example=example_input_np
-)                                                                   # :contentReference[oaicite:3]{index=3}
+)                                                                  
 
 # 5. Register it as a new version
 new_uri = f"file://{os.path.abspath(save_path)}"
