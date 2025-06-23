@@ -1,6 +1,7 @@
 import typer
 from typing import Type
 from data.data_etl import load_and_transform
+from config.config_loader import Config
 from models.training import train
 import logging
 
@@ -16,16 +17,17 @@ logging.basicConfig(
 app = typer.Typer()
 
 @app.command()
-def pipeline(data_path: str, split_ratio: float, 
-             epochs: int, lr: float):
-
+def pipeline(config_path: str):
+    
+    # load the config
+    config = Config(config_path)
     # load and transform the training data
-    train_dataloader, test_dataloader = load_and_transform(path=data_path, split_ratio=split_ratio)
+    train_dataloader, test_dataloader = load_and_transform(config)
 
     # train the DL model
     trainer = train()
-    trainer.train_the_model(epochs=epochs, train_dataloader=train_dataloader, 
-                          test_dataloader=test_dataloader, learning_rate = lr)
+    trainer.train_the_model(train_dataloader=train_dataloader, 
+                          test_dataloader=test_dataloader, config=config)
 
 
 def main():

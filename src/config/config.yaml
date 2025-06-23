@@ -1,11 +1,11 @@
 data:
   path: '/home/tamil/DL-animal-10/data1'
-  split_ration: 0.8
-training:
+  split_ratio: 0.8
+train:
   learning_rate: 0.003
   epochs: 1
 mlflow:
   log_every: 5
   experiment_name: "animal_classifier"
-  url: "0.0.0.0"
+  url: "http://0.0.0.0"
   port: 5000

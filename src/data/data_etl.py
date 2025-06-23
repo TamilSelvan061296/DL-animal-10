@@ -7,15 +7,17 @@ from utils.helper_functions import save_tensor_image
 
 logger = logging.getLogger(__name__)
 
-def load_and_transform(path: str, split_ratio: float) -> None:
+def load_and_transform(config) -> None:
 
-    dataset = datasets.ImageFolder(path)
-    train_size: float = int(split_ratio * len(dataset))
+    # load the data config
+    data_cfg = config.get("data", {})
+    dataset = datasets.ImageFolder(data_cfg["path"])
+    train_size: float = int(data_cfg["split_ratio"] * len(dataset))
     test_size: float = len(dataset) - train_size
 
     train_data, test_data = torch.utils.data.random_split(dataset, [train_size, test_size])
 
-    logger.info(f"Loaded the data from {path}")
+    logger.info(f"Loaded the data from {data_cfg["path"]}")
 
     train_data.dataset.transform = transforms.Compose([transforms.RandomRotation(30),
                                                     transforms.RandomResizedCrop(224),

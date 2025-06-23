@@ -13,6 +13,7 @@ import mlflow
 import mlflow.pytorch
 from mlflow.models.signature import infer_signature
 import logging
+from config.config_loader import Config
 
 logger = logging.getLogger(__name__)
 
@@ -36,25 +37,28 @@ class train:
         self.model.classifier = classifier
 
 
-    def train_the_model(self, epochs, learning_rate, 
-                        train_dataloader, test_dataloader):
+    def train_the_model(self, train_dataloader, test_dataloader, config: Config):
+
+        # load the config
+        train_cfg = config.get("train", {})
+        mlflow_cfg = config.get("mlflow", {})
 
         logger.info("Training started. For training logs visit 'http://localhost:5000/'")
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         criterion = nn.NLLLoss()
-        optimizer = optim.Adam(self.model.classifier.parameters(), lr = learning_rate)
+        optimizer = optim.Adam(self.model.classifier.parameters(), lr = train_cfg["learning_rate"])
 
         self.model = self.model.to(device)
 
         # registering in mlflow
-        mlflow.set_tracking_uri("http://localhost:5000")
-        mlflow.set_experiment("animal_classifier")
+        mlflow.set_tracking_uri(f"{mlflow_cfg["url"]}:{mlflow_cfg["port"]}")
+        mlflow.set_experiment(mlflow_cfg["experiment_name"])
 
-        log_every = 5
+        log_every = mlflow_cfg["log_every"]
 
         hyperparams = {
-            "epochs": epochs,
+            "epochs": train_cfg["epochs"],
             "log_every": log_every,
             "optimizer": optimizer.__class__.__name__,
             "lr": optimizer.param_groups[0]['lr'],
@@ -68,7 +72,7 @@ class train:
             steps = 0
             running_loss = 0
 
-            for epoch in range(epochs):
+            for epoch in range(train_cfg["epochs"]):
                 start = time.perf_counter()
                 self.model.train()
 
@@ -127,16 +131,23 @@ class train:
                         mlflow.log_metric("accuracy", accuracy / len(test_dataloader), step=steps)
                         mlflow.log_metric("epoch_time_s", elapsed, step=steps)
 
-                        print(f"Epoch {epoch+1}/{epochs} took {elapsed:.2f} s;"
+                        print(f"Epoch {epoch+1}/{train_cfg["epochs"]} took {elapsed:.2f} s;"
                             f"Train_loss: {running_loss};"
                             f"Test_loss: {test_loss/len(test_dataloader):.3f}; "
                             f"Accuracy: {accuracy/len(test_dataloader):.3f}")
                         running_loss = 0
                         self.model.train()
 
-                        if accuracy/len(test_dataloader) > 0.85: # save the version of the model if accuracy > 0.85
+                        if accuracy/len(test_dataloader) > 0.10: # save the version of the model if accuracy > 0.85
+                            example_tensor = torch.rand(1, 3, 224, 224, device=device)
 
-                            signature = infer_signature(inputs[0], ps[0])
+                            with torch.no_grad():
+                                output_tensor = self.model(example_tensor)
+
+                            example_input_np = example_tensor.cpu().numpy()
+                            output_np        = output_tensor.cpu().numpy()
+
+                            signature = infer_signature(example_input_np, output_np)
                             mlflow.pytorch.log_model(
                                 pytorch_model=self.model,
                                 artifact_path="models",
@@ -144,6 +155,8 @@ class train:
                                 signature=signature,
                                 )
                             print("Model registered under run:", run.info.run_id)
+                        
+                        self.model.train()
             
             
             mlflow.pytorch.log_model(
