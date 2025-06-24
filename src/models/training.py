@@ -65,12 +65,13 @@ class train:
             "criterion": criterion.__class__.__name__
         }
 
-        with mlflow.start_run(run_name = "final-run") as run:
+        with mlflow.start_run(run_name = mlflow_cfg["run_name"]) as run:
 
             mlflow.log_params(hyperparams)
 
             steps = 0
             running_loss = 0
+            required_max_accuracy = 0.85
 
             for epoch in range(train_cfg["epochs"]):
                 start = time.perf_counter()
@@ -138,7 +139,8 @@ class train:
                         running_loss = 0
                         self.model.train()
 
-                        if accuracy/len(test_dataloader) > 0.10: # save the version of the model if accuracy > 0.85
+
+                        if accuracy/len(test_dataloader) > required_max_accuracy: # save the version of the model if accuracy > 0.85
                             example_tensor = torch.rand(1, 3, 224, 224, device=device)
 
                             with torch.no_grad():
@@ -155,6 +157,7 @@ class train:
                                 signature=signature,
                                 )
                             print("Model registered under run:", run.info.run_id)
+                            required_max_accuracy = accuracy/len(test_dataloader)
                         
                         self.model.train()
             
