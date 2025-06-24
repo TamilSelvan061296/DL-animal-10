@@ -15,7 +15,7 @@ def preprocess_image(image_path: str) -> np.ndarray:
     return arr.transpose(2, 0, 1)  # CHW
 
 def predict_via_rest(img_tensor: np.ndarray,
-                     server_url: str = "http://44.222.155.205:5000/invocations"
+                     server_url: str = "http://3.234.212.197:5000/invocations"
                     ) -> np.ndarray:
     payload = {"instances": [img_tensor.tolist()]}
     headers = {"Content-Type": "application/json"}
