@@ -8,14 +8,14 @@ def preprocess_image(image_path: str) -> np.ndarray:
     img = img.resize((224, 224))
     arr = np.array(img, dtype=np.float32) / 255.0
     # ImageNet normalization
-    mean = [0.485, 0.456, 0.406]
-    std  = [0.229, 0.224, 0.225]
-    for c in range(3):
-        arr[..., c] = (arr[..., c] - mean[c]) / std[c]
+    # mean = [0.485, 0.456, 0.406]
+    # std  = [0.229, 0.224, 0.225]
+    # for c in range(3):
+    #     arr[..., c] = (arr[..., c] - mean[c]) / std[c]
     return arr.transpose(2, 0, 1)  # CHW
 
 def predict_via_rest(img_tensor: np.ndarray,
-                     server_url: str = "http://3.234.212.197:5000/invocations"
+                     server_url: str = "http://0.0.0.0:5000/invocations"
                     ) -> np.ndarray:
     payload = {"instances": [img_tensor.tolist()]}
     headers = {"Content-Type": "application/json"}
@@ -38,7 +38,7 @@ def predict_via_rest(img_tensor: np.ndarray,
     return preds
 
 if __name__ == "__main__":
-    IMAGE_PATH = "/mnt/c/Users/TamilSelvanMurugesan/Downloads/random_dog.jpg"
+    IMAGE_PATH = "/home/tamil/DL-animal-10/data1/chicken/16.jpeg"
     tensor     = preprocess_image(IMAGE_PATH)
     preds      = predict_via_rest(tensor)
 

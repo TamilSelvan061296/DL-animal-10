@@ -3,7 +3,7 @@ from torchvision import datasets, transforms
 
 from collections import Counter
 import logging
-from utils.helper_functions import save_tensor_image
+from dl_animal_10.utils.helper_functions import save_tensor_image
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ def verify_the_dataset(train_loader, test_loader = None) -> None:
     data, target = next(iter(train_loader))
     logger.info(f"Data shape: {data.shape}")
     logger.info(f"Target shape: {target.shape}")
-
+    
     train_dataset = train_loader.dataset.dataset
     all_labels = train_dataset.targets    # e.g. [0, 5, 3, 0, 1, …]
     class_names = train_dataset.classes   # e.g. ["cat","dog","elephant",…]

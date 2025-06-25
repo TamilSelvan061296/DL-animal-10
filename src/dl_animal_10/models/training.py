@@ -13,7 +13,7 @@ import mlflow
 import mlflow.pytorch
 from mlflow.models.signature import infer_signature
 import logging
-from config.config_loader import Config
+from dl_animal_10.config.config_loader import Config
 
 logger = logging.getLogger(__name__)
 

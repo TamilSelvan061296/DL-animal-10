@@ -14,6 +14,8 @@ flavors:
     code: null
     model_data: data
     pytorch_version: 2.7.1+cu126
+    load_model_args:
+      map_location: cpu
 is_signature_from_type_hint: false
 mlflow_version: 3.1.0
 model_id: m-eb936d0c38c645b591388a4140a9076f
