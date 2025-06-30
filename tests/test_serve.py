@@ -2,24 +2,24 @@ import json
 import requests
 import numpy as np
 from PIL import Image
+import base64
 
-def preprocess_image(image_path: str) -> np.ndarray:
-    img = Image.open(image_path).convert("RGB")
-    img = img.resize((224, 224))
-    arr = np.array(img, dtype=np.float32) / 255.0
-    # ImageNet normalization
-    # mean = [0.485, 0.456, 0.406]
-    # std  = [0.229, 0.224, 0.225]
-    # for c in range(3):
-    #     arr[..., c] = (arr[..., c] - mean[c]) / std[c]
-    return arr.transpose(2, 0, 1)  # CHW
+# def preprocess_image(image_path: str) -> np.ndarray:
+#     img = Image.open(image_path).convert("RGB")
+#     img = img.resize((224, 224))
+#     arr = np.array(img, dtype=np.float32) / 255.0
+#     # ImageNet normalization
+#     # mean = [0.485, 0.456, 0.406]
+#     # std  = [0.229, 0.224, 0.225]
+#     # for c in range(3):
+#     #     arr[..., c] = (arr[..., c] - mean[c]) / std[c]
+#     return arr.transpose(2, 0, 1)  # CHW
 
-def predict_via_rest(img_tensor: np.ndarray,
-                     server_url: str = "http://0.0.0.0:5000/invocations"
+def predict_via_rest(encoded_image,
+                     server_url: str = "http://0.0.0.0:8000/invocations"
                     ) -> np.ndarray:
-    payload = {"instances": [img_tensor.tolist()]}
-    headers = {"Content-Type": "application/json"}
-    resp = requests.post(server_url, headers=headers, data=json.dumps(payload))
+    headers={"Content-Type": "application/octet-stream"}
+    resp = requests.post(server_url, headers=headers, data=encoded_image)
     resp.raise_for_status()
     resp_json = resp.json()
 
@@ -38,11 +38,13 @@ def predict_via_rest(img_tensor: np.ndarray,
     return preds
 
 if __name__ == "__main__":
-    IMAGE_PATH = "/home/tamil/DL-animal-10/data1/chicken/16.jpeg"
-    tensor     = preprocess_image(IMAGE_PATH)
-    preds      = predict_via_rest(tensor)
+    with open("/home/tamil/DL-animal-10/data1/spider/e03db4072cf01c22d2524518b7444f92e37fe5d404b0144390f8c47ba6edbc_640.jpg", "rb") as img_file:
+        encoded_image = img_file.read()
+    
+    
+    preds      = predict_via_rest(encoded_image)
 
     print("Raw model output:\n", preds)
-    class_idxs = preds.argmax(axis=1)
-    print("Predicted class indices:", class_idxs)
-    print("Single-image prediction:", class_idxs[0])
+    # class_idxs = preds.argmax(axis=1)
+    # print("Predicted class indices:", class_idxs)
+    # print("Single-image prediction:", class_idxs[0])

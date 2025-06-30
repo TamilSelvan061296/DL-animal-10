@@ -1,0 +1,21 @@
+flavors:
+  python_function:
+    artifacts:
+      model_dir:
+        path: artifacts/animal_classifier_892
+        uri: /home/tamil/DL-animal-10/src/dl_animal_10/models/animal_classifier_892
+    cloudpickle_version: 3.1.1
+    code: null
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pyfunc.model
+    python_model: python_model.pkl
+    python_version: 3.12.1
+    streamable: false
+mlflow_version: 3.1.0
+model_id: null
+model_size_bytes: 61030740
+model_uuid: 5689f8e356834baa9464d03eff30684f
+prompts: null
+utc_time_created: '2025-06-30 11:45:45.067207'

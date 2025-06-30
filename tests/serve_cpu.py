@@ -1,23 +1,36 @@
 # serve_cpu.py
+
 import torch
 import mlflow.pytorch
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request,  Body
+from contextlib import asynccontextmanager
 
-MODEL_URI = "/home/tamil/DL-animal-10/src/dl_animal_10/models/animal_classifier_with_sig"
+MODEL_URI = "/home/tamil/DL-animal-10/src/dl_animal_10/models/animal_classifier_with_preprocessing_step"
 
-app = FastAPI()
-
-@app.on_event("startup")
-def load_model():
-    # map_location forces CPU load
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Load the model into CPU memory on startup
     global model
-    model = mlflow.pytorch.load_model(MODEL_URI, map_location=torch.device("cpu"))
+    model = mlflow.pyfunc.load_model(MODEL_URI)
+    yield
+    # (Optional) add any teardown/cleanup here
+
+app = FastAPI(lifespan=lifespan)
 
 @app.post("/invocations")
-async def predict(request: Request):
-    payload = await request.json()
+async def predict(data: bytes = Body(..., media_type="application/octet-stream")):
     # assume input is a list of lists or similar
-    tensor = torch.tensor(payload["instances"])
     with torch.no_grad():
-        out = model(tensor).cpu().numpy().tolist()
+        out = model.predict(data)
     return {"predictions": out}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "serve_cpu:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
+        log_level="info"
+    )
