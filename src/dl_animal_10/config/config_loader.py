@@ -9,7 +9,7 @@ class Config:
         return self._cfg.get(selection, default)
     
     def __getitem__(self, key):
-        return self._cgf[key]
+        return self._cfg[key]
     
     def __repr__(self):
         return f"Config({self._cfg!r})"
