@@ -4,6 +4,9 @@ from torchvision import datasets, transforms
 from collections import Counter
 import logging
 from dl_animal_10.utils.helper_functions import save_tensor_image
+from sklearn.model_selection import train_test_split
+from torch.utils.data import Subset
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -12,12 +15,17 @@ def load_and_transform(config) -> None:
     # load the data config
     data_cfg = config.get("data", {})
     dataset = datasets.ImageFolder(data_cfg["path"])
-    train_size: float = int(data_cfg["split_ratio"] * len(dataset))
-    test_size: float = len(dataset) - train_size
+    target = dataset.targets
 
-    train_data, test_data = torch.utils.data.random_split(dataset, [train_size, test_size])
+    train_idx, test_idx = train_test_split(np.arange(len(target)),
+                                           test_size=data_cfg["test_size"],
+                                           random_state=42,
+                                           shuffle=True,
+                                           stratify=target)
+    
 
-    logger.info(f"Loaded the data from {data_cfg["path"]}")
+    train_subset = Subset(dataset, train_idx)
+    test_subset = Subset(dataset, test_idx)
 
     train_data.dataset.transform = transforms.Compose([transforms.RandomRotation(30),
                                                     transforms.RandomResizedCrop(224),
@@ -28,11 +36,10 @@ def load_and_transform(config) -> None:
                                         transforms.RandomResizedCrop(224),
                                         transforms.ToTensor()])
 
-    logger.info(f"Transformed the data")
+    train_dataloader = torch.utils.data.DataLoader(train_data, batch_size=data_cfg["batch_size"], shuffle=False)
+    test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=data_cfg["batch_size"], shuffle=False)
 
-
-    train_dataloader = torch.utils.data.DataLoader(train_data, batch_size=32, shuffle=True)
-    test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=32, shuffle=False)
+    logger.info(f"Loaded and transformed the data from {data_cfg["path"]}")
 
     logger.info(f"Loaded the data into torch dataloader after transformation")
     logger.info(f"Information about the dataset")
