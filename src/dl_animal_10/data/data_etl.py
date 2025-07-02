@@ -27,17 +27,17 @@ def load_and_transform(config) -> None:
     train_subset = Subset(dataset, train_idx)
     test_subset = Subset(dataset, test_idx)
 
-    train_data.dataset.transform = transforms.Compose([transforms.RandomRotation(30),
+    train_subset.dataset.transform = transforms.Compose([transforms.RandomRotation(30),
                                                     transforms.RandomResizedCrop(224),
                                                     transforms.RandomHorizontalFlip(),
                                                     transforms.ToTensor()])
 
-    test_data.dataset.transform = transforms.Compose([transforms.RandomRotation(30),
+    test_subset.dataset.transform = transforms.Compose([transforms.RandomRotation(30),
                                         transforms.RandomResizedCrop(224),
                                         transforms.ToTensor()])
 
-    train_dataloader = torch.utils.data.DataLoader(train_data, batch_size=data_cfg["batch_size"], shuffle=False)
-    test_dataloader = torch.utils.data.DataLoader(test_data, batch_size=data_cfg["batch_size"], shuffle=False)
+    train_dataloader = torch.utils.data.DataLoader(train_subset, batch_size=data_cfg["batch_size"], shuffle=False)
+    test_dataloader = torch.utils.data.DataLoader(test_subset, batch_size=data_cfg["batch_size"], shuffle=False)
 
     logger.info(f"Loaded and transformed the data from {data_cfg["path"]}")
 
