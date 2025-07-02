@@ -1,8 +1,8 @@
 import typer
 from typing import Type
-from data.data_etl import load_and_transform
-from config.config_loader import Config
-from models.training import train
+from dl_animal_10.data.data_etl import load_and_transform
+from dl_animal_10.config.config_loader import Config
+from dl_animal_10.models.training import train
 import logging
 
 logging.basicConfig(

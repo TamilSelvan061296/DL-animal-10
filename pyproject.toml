@@ -21,4 +21,4 @@ build-backend = "setuptools.build_meta"
 
 
 [project.scripts]
-train-animal-10 = "main:main"
+train-animal-10 = "dl_animal_10.main:main"
