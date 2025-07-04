@@ -65,6 +65,18 @@ class train:
             "criterion": criterion.__class__.__name__
         }
 
+        # inferring signature for the model:
+        example_tensor = torch.rand(1, 3, 224, 224, device=device)
+
+        with torch.no_grad():
+            output_tensor = self.model(example_tensor)
+
+        example_input_np = example_tensor.cpu().numpy()
+        output_np        = output_tensor.cpu().numpy()
+
+        signature = infer_signature(example_input_np, output_np)
+
+        # start model training
         with mlflow.start_run(run_name = mlflow_cfg["run_name"]) as run:
 
             mlflow.log_params(hyperparams)
@@ -141,15 +153,7 @@ class train:
 
 
                         if accuracy/len(test_dataloader) > required_max_accuracy: # save the version of the model if accuracy > 0.85
-                            example_tensor = torch.rand(1, 3, 224, 224, device=device)
-
-                            with torch.no_grad():
-                                output_tensor = self.model(example_tensor)
-
-                            example_input_np = example_tensor.cpu().numpy()
-                            output_np        = output_tensor.cpu().numpy()
-
-                            signature = infer_signature(example_input_np, output_np)
+                            
                             mlflow.pytorch.log_model(
                                 pytorch_model=self.model,
                                 artifact_path="models",
