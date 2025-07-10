@@ -150,3 +150,6 @@ print(response.json())
 ## Project Insights
 
 See `README-for-my-approach.md` for a detailed write-up on the project journey, challenges, and design decisions.
+
+
+**Note:** This README was written using an AI tool(Cursor)
