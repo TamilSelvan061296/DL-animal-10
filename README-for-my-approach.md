@@ -1,3 +1,5 @@
+This readme captures my learnings, the difficulties I faced during the project, my approach to solve them and the insights I derived.
+
 The goal of this project is:
 -
 - To understand the entire cycle of development involved in training and hosting for inferencing a DL model.
